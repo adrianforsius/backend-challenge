@@ -47,3 +47,18 @@ func Basket(baskets map[string][]Product, ID string) ([]Product, error) {
 	}
 	return nil, fmt.Errorf("No such basket found in baskets")
 }
+
+var codes = []string{
+	"PEN",
+	"TSHIRT",
+	"MUG",
+}
+
+func Validate(product Product) error {
+	for _, code := range codes {
+		if product.Code == code {
+			return nil
+		}
+	}
+	return fmt.Errorf("no such code")
+}

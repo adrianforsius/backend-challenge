@@ -45,6 +45,20 @@ func main() {
 			err := json.NewDecoder(r.Body).Decode(&products)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
+				return
+			}
+
+			for _, p := range products {
+				err := product.Validate(p)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
+					return
+				}
+			}
+
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
+				return
 			}
 
 			id := baskets.Add(products)
