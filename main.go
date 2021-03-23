@@ -61,7 +61,7 @@ func main() {
 				return
 			}
 
-			id := baskets.Add(products)
+			id := baskets.New(products)
 			resp, err := json.Marshal(NewBasketResp{
 				ID: id,
 			})
@@ -71,8 +71,45 @@ func main() {
 			}
 			w.Write(resp)
 			return
+		case http.MethodPatch:
+			vars, ok := r.URL.Query()["basket_id"]
+			if !ok {
+				http.Error(w, "{\"error:\": \"missing basket id\"}", http.StatusBadRequest)
+				return
+			}
+
+			products := make([]product.Product, 0)
+			err := json.NewDecoder(r.Body).Decode(&products)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
+				return
+			}
+
+			for _, p := range products {
+				err := product.Validate(p)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
+					return
+				}
+			}
+
+			prodResp, err := baskets.Add(products, vars[0])
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
+				return
+			}
+
+			data, err := json.Marshal(prodResp)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
+				return
+			}
+
+			w.Write(data)
+			return
+
 		default:
-			fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+			http.Error(w, "{\"error:\": \"not found\"}", http.StatusNotFound)
 		}
 	}))
 

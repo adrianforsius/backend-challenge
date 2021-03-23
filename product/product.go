@@ -31,12 +31,22 @@ func (b *BasketStorage) Get(id string) ([]Product, error) {
 	return Basket(b.baskets, id)
 }
 
-func (b *BasketStorage) Add(products []Product) string {
+func (b *BasketStorage) New(products []Product) string {
 	b.l.Lock()
 	defer b.l.Unlock()
 	id := uuid.New().String()
 	b.baskets[id] = products
 	return id
+}
+
+func (b *BasketStorage) Add(products []Product, id string) ([]Product, error) {
+	b.l.Lock()
+	defer b.l.Unlock()
+	if _, ok := b.baskets[id]; !ok {
+		return nil, fmt.Errorf("no such basket found")
+	}
+	b.baskets[id] = append(b.baskets[id], products...)
+	return b.baskets[id], nil
 }
 
 func Basket(baskets map[string][]Product, ID string) ([]Product, error) {
