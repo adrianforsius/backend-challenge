@@ -9,6 +9,10 @@ import (
 	"github.com/adrianforsius/backend-challenge/product"
 )
 
+type NewBasketResp struct {
+	ID string `json:"id"`
+}
+
 func main() {
 	baskets := product.NewBasket()
 
@@ -30,6 +34,22 @@ func main() {
 			w.Write(data)
 			return
 		case http.MethodPost:
+			products := make([]product.Product, 0)
+			err := json.NewDecoder(r.Body).Decode(&products)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
+			}
+
+			id := baskets.Add(products)
+			resp, err := json.Marshal(NewBasketResp{
+				ID: id,
+			})
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
+				return
+			}
+			w.Write(resp)
+			return
 		default:
 			fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
 		}
