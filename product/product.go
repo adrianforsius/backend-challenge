@@ -49,6 +49,16 @@ func (b *BasketStorage) Add(products []Product, id string) ([]Product, error) {
 	return b.baskets[id], nil
 }
 
+func (b *BasketStorage) Remove(id string) error {
+	b.l.Lock()
+	defer b.l.Unlock()
+	if _, ok := b.baskets[id]; !ok {
+		return fmt.Errorf("no such basket found")
+	}
+	delete(b.baskets, id)
+	return nil
+}
+
 func Basket(baskets map[string][]Product, ID string) ([]Product, error) {
 	for id, basket := range baskets {
 		if id == ID {

@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+
 	"github.com/adrianforsius/backend-challenge/product"
 )
 
@@ -14,11 +17,12 @@ type NewBasketResp struct {
 }
 
 type BasketTotalResp struct {
-	Amount int `json:"amount"`
+	Amount string `json:"amount"`
 }
 
 func main() {
 	baskets := product.NewBasket()
+	printer := message.NewPrinter(language.English)
 
 	router := http.NewServeMux()
 	router.Handle("/checkout", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -36,12 +40,14 @@ func main() {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
 				return
 			}
-			var resp BasketTotalResp
+			var total int
 			for _, p := range prod {
-				resp.Amount += p.Price
+				total += p.Price
 			}
 
-			data, err := json.Marshal(resp)
+			data, err := json.Marshal(BasketTotalResp{
+				Amount: printer.Sprintf("%d $", 1000),
+			})
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
 				return
@@ -114,6 +120,21 @@ func main() {
 			}
 
 			w.Write(data)
+			return
+		case http.MethodDelete:
+			vars, ok := r.URL.Query()["basket_id"]
+			if !ok {
+				http.Error(w, "{\"error:\": \"missing basket id\"}", http.StatusBadRequest)
+				return
+			}
+
+			err := baskets.Remove(vars[0])
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
+				return
+			}
+
+			w.Write([]byte(""))
 			return
 
 		default:
