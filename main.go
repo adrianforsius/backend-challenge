@@ -18,6 +18,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.Handle("/checkout", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer log.Printf("state: %+v\n", baskets)
 		switch r.Method {
 		case http.MethodGet:
 			prod, err := baskets.Get("1")
@@ -55,6 +56,6 @@ func main() {
 		}
 	}))
 
-	err := http.ListenAndServe(":8082", nil)
+	err := http.ListenAndServe(":8082", router)
 	log.Fatal(err)
 }
