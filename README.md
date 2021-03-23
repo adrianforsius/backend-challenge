@@ -63,3 +63,12 @@ Examples:
 - Commit messages (include .git in zip)
 - Thread-safety
 - Clear scalability
+
+**Run App**:
+go run main.go
+
+or
+
+docker build -t lana . && docker run -it  -p 8082:8082 lana
+
+
