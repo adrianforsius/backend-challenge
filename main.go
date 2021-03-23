@@ -21,7 +21,13 @@ func main() {
 		defer log.Printf("state: %+v\n", baskets)
 		switch r.Method {
 		case http.MethodGet:
-			prod, err := baskets.Get("1")
+			vars, ok := r.URL.Query()["basket_id"]
+			if !ok {
+				http.Error(w, "{\"error:\": \"missing basket id\"}", http.StatusBadRequest)
+				return
+			}
+
+			prod, err := baskets.Get(vars[0])
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
 				return
