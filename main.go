@@ -13,6 +13,10 @@ type NewBasketResp struct {
 	ID string `json:"id"`
 }
 
+type BasketTotalResp struct {
+	Amount int `json:"amount"`
+}
+
 func main() {
 	baskets := product.NewBasket()
 
@@ -32,8 +36,12 @@ func main() {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
 				return
 			}
+			var resp BasketTotalResp
+			for _, p := range prod {
+				resp.Amount += p.Price
+			}
 
-			data, err := json.Marshal(prod)
+			data, err := json.Marshal(resp)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
 				return
