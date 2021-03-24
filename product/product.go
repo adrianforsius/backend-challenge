@@ -5,17 +5,17 @@ import (
 	"math"
 )
 
-type Product struct {
-	Price int    `json:"price"` // Reprecents cents
-	Name  string `json:"name"`
-	Code  string `json:"code"`
-}
-
 const (
 	PRICE_PEN    = 500
 	PRICE_TSHIRT = 2000
 	PRICE_MUG    = 750
 )
+
+type Product struct {
+	Price int    `json:"price"` // Reprecents cents
+	Name  string `json:"name"`
+	Code  string `json:"code"`
+}
 
 var Merchendise = []Product{
 	{

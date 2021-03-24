@@ -30,6 +30,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.Handle("/checkout", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// log state at end of request to easier see what is going on
 		defer log.Printf("state: %+v\n", baskets)
 		switch r.Method {
 		case http.MethodGet:
