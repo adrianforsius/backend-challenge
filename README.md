@@ -1,3 +1,19 @@
+**Run App**:
+```
+go run main.go
+```
+or
+```
+docker build -t lana . && docker run -it  -p 8082:8082 lana
+```
+
+** Test **
+```
+go run ./...
+```
+
+
+
 Lana has come to conclusion that users are very likely to buy awesome Lana merchandising from a physical store that sells the following 3 products:
 
 ```
@@ -64,11 +80,5 @@ Examples:
 - Thread-safety
 - Clear scalability
 
-**Run App**:
-go run main.go
-
-or
-
-docker build -t lana . && docker run -it  -p 8082:8082 lana
 
 
