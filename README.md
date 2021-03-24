@@ -1,4 +1,4 @@
-**Run App**:
+**Run App**
 ```
 go run main.go
 ```
@@ -7,7 +7,7 @@ or
 docker build -t lana . && docker run -it  -p 8082:8082 lana
 ```
 
-** Test **
+**Test**
 ```
 go run ./...
 ```
