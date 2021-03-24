@@ -27,7 +27,6 @@ func TestDiscountSmallPurchase(t *testing.T) {
 	}
 }
 
-// I don't udnerstand the spec and I can't guess what this is suppose to be
 func TestDiscountSmallExtraPenPurchase(t *testing.T) {
 	merchendise := product.Merchendise
 	var products []product.Product
@@ -45,7 +44,6 @@ func TestDiscountSmallExtraPenPurchase(t *testing.T) {
 	}
 }
 
-// This test is working by contrary to what the spec say, IE I switched pen and t-shirt discount
 func TestDiscountTShirtPurchase(t *testing.T) {
 	merchendise := product.Merchendise
 	var products []product.Product
