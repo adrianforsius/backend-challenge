@@ -12,6 +12,24 @@ docker build -t lana . && docker run -it  -p 8082:8082 lana
 go run ./...
 ```
 
+**Usage**
+create checkout
+```
+curl -XPOST "localhost:8082/checkout"
+```
+add to checkout
+```
+curl -XPATCH -d '{"product": "PEN"}' "localhost:8082/checkout?basket_id={basket_id}"
+```
+remove checkout
+```
+curl -XDELETE "localhost:8082/checkout?basket_id={basket_id}"
+```
+get checkout total price
+```
+curl "localhost:8082/checkout?basket_id={basket_id}"
+```
+
 
 
 Lana has come to conclusion that users are very likely to buy awesome Lana merchandising from a physical store that sells the following 3 products:
