@@ -35,7 +35,9 @@ func (b *BasketStorage) Get(id string) ([]Product, error) {
 func (b *BasketStorage) New() string {
 	b.l.Lock()
 	defer b.l.Unlock()
-	return uuid.New().String()
+	id := uuid.New().String()
+	b.baskets[id] = make([]Product, 0)
+	return id
 }
 
 func (b *BasketStorage) Add(products []Product, id string) ([]Product, error) {
@@ -91,13 +93,13 @@ var Merchendise = []Product{
 	},
 }
 
-func Validate(product Product) error {
+func Validate(code string) (Product, error) {
 	for _, m := range Merchendise {
-		if product.Code == m.Code {
-			return nil
+		if code == m.Code {
+			return m, nil
 		}
 	}
-	return fmt.Errorf("no such code")
+	return Product{}, fmt.Errorf("no such code")
 }
 
 func Discont(products []Product) int {
@@ -111,11 +113,14 @@ func Discont(products []Product) int {
 		items[p.Code] += 1
 		total += p.Price
 	}
-	penDiscounts := int(math.Trunc(float64(items["PEN"] / 3)))
-	total -= penDiscounts * PRICE_PEN
 
 	if items["TSHIRT"] >= 3 {
-		discount := int(math.Round(float64(items["TSHIRT"]) * 25 / 100))
+		penDiscounts := int(math.Trunc(float64(items["TSHIRT"] / 3)))
+		total -= penDiscounts * PRICE_TSHIRT
+	}
+
+	if items["PEN"] >= 3 {
+		discount := int(math.Trunc(float64(items["PEN"]) * 25 / 100))
 		total -= discount
 	}
 	return total

@@ -81,13 +81,13 @@ func main() {
 				return
 			}
 
-			err := product.Validate(req.Product)
+			prod, err := product.Validate(req.Product)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
 				return
 			}
 
-			prodResp, err := baskets.Add(products, vars[0])
+			prodResp, err := baskets.Add([]product.Product{prod}, vars[0])
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
 				return
