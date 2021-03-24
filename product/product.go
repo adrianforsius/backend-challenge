@@ -2,6 +2,7 @@ package product
 
 import (
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/google/uuid"
@@ -31,12 +32,10 @@ func (b *BasketStorage) Get(id string) ([]Product, error) {
 	return Basket(b.baskets, id)
 }
 
-func (b *BasketStorage) New(products []Product) string {
+func (b *BasketStorage) New() string {
 	b.l.Lock()
 	defer b.l.Unlock()
-	id := uuid.New().String()
-	b.baskets[id] = products
-	return id
+	return uuid.New().String()
 }
 
 func (b *BasketStorage) Add(products []Product, id string) ([]Product, error) {
@@ -68,17 +67,56 @@ func Basket(baskets map[string][]Product, ID string) ([]Product, error) {
 	return nil, fmt.Errorf("No such basket found in baskets")
 }
 
-var codes = []string{
-	"PEN",
-	"TSHIRT",
-	"MUG",
+const (
+	PRICE_PEN    = 500
+	PRICE_TSHIRT = 2000
+	PRICE_MUG    = 750
+)
+
+var Merchendise = []Product{
+	{
+		Code:  "PEN",
+		Name:  "Lana pen",
+		Price: PRICE_PEN,
+	},
+	{
+		Code:  "TSHIRT",
+		Name:  "Lana T-Shirt",
+		Price: PRICE_TSHIRT,
+	},
+	{
+		Code:  "MUG",
+		Name:  "Lana Coffee Mug",
+		Price: PRICE_MUG,
+	},
 }
 
 func Validate(product Product) error {
-	for _, code := range codes {
-		if product.Code == code {
+	for _, m := range Merchendise {
+		if product.Code == m.Code {
 			return nil
 		}
 	}
 	return fmt.Errorf("no such code")
+}
+
+func Discont(products []Product) int {
+	items := map[string]int{
+		"PEN":    0,
+		"TSHIRT": 0,
+		"MUG":    0,
+	}
+	var total int
+	for _, p := range products {
+		items[p.Code] += 1
+		total += p.Price
+	}
+	penDiscounts := int(math.Trunc(float64(items["PEN"] / 3)))
+	total -= penDiscounts * PRICE_PEN
+
+	if items["TSHIRT"] >= 3 {
+		discount := int(math.Round(float64(items["TSHIRT"]) * 25 / 100))
+		total -= discount
+	}
+	return total
 }

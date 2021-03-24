@@ -12,6 +12,10 @@ import (
 	"github.com/adrianforsius/backend-challenge/product"
 )
 
+type AddProductReq struct {
+	Product string `json:"product"`
+}
+
 type NewBasketResp struct {
 	ID string `json:"id"`
 }
@@ -40,13 +44,11 @@ func main() {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
 				return
 			}
-			var total int
-			for _, p := range prod {
-				total += p.Price
-			}
+
+			price := product.Discont(prod)
 
 			data, err := json.Marshal(BasketTotalResp{
-				Amount: printer.Sprintf("%d $", 1000),
+				Amount: printer.Sprintf("%d $", price),
 			})
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusInternalServerError)
@@ -55,27 +57,7 @@ func main() {
 			w.Write(data)
 			return
 		case http.MethodPost:
-			products := make([]product.Product, 0)
-			err := json.NewDecoder(r.Body).Decode(&products)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
-				return
-			}
-
-			for _, p := range products {
-				err := product.Validate(p)
-				if err != nil {
-					http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
-					return
-				}
-			}
-
-			if err != nil {
-				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
-				return
-			}
-
-			id := baskets.New(products)
+			id := baskets.New()
 			resp, err := json.Marshal(NewBasketResp{
 				ID: id,
 			})
@@ -92,19 +74,17 @@ func main() {
 				return
 			}
 
-			products := make([]product.Product, 0)
-			err := json.NewDecoder(r.Body).Decode(&products)
+			var req AddProductReq
+			err := json.NewDecoder(r.Body).Decode(&req)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusNotFound)
 				return
 			}
 
-			for _, p := range products {
-				err := product.Validate(p)
-				if err != nil {
-					http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
-					return
-				}
+			err := product.Validate(req.Product)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("{\"error:\": \"failed %s\"}", err), http.StatusBadRequest)
+				return
 			}
 
 			prodResp, err := baskets.Add(products, vars[0])
