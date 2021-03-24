@@ -56,13 +56,13 @@ func Discont(products []Product) int {
 		total += p.Price
 	}
 
-	if items["TSHIRT"] >= 3 {
-		penDiscounts := int(math.Trunc(float64(items["TSHIRT"] / 3)))
-		total -= penDiscounts * PRICE_TSHIRT
+	if items["PEN"] >= 2 {
+		penDiscounts := int(math.Trunc(float64(items["PEN"] / 2)))
+		total -= penDiscounts * PRICE_PEN
 	}
 
-	if items["PEN"] >= 3 {
-		discount := int(math.Trunc(float64(items["PEN"]) * 25 / 100))
+	if items["TSHIRT"] >= 3 {
+		discount := int(math.Round(float64(items["TSHIRT"]*PRICE_TSHIRT) * 25 / 100))
 		total -= discount
 	}
 	return total
